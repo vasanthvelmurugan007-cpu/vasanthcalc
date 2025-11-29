@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IndiaCalc – Made by Vasanth</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: linear-gradient(135deg, #667eea, #764ba2); min-height:100vh; padding:10px; }
+    .container { max-width: 500px; margin: 10px auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    header { background: #ff9933; color: white; text-align: center; padding: 20px; }
+    header h1 { font-size: 2.5em; }
+    header p { font-size: 1.1em; opacity: 0.9; }
+
+    .tabs { display: flex; background: #138808; flex-wrap: wrap; }
+    .tab-btn { flex:1; min-width:100px; padding:15px; color:white; border:none; cursor:pointer; font-weight:bold; font-size:0.9em; }
+    .tab-btn.active, .tab-btn:hover { background: #006400; }
+
+    .calc { padding:25px; display:none; }
+    .calc.active { display:block; }
+    h2 { color: #138808; margin-bottom:15px; text-align:center; font-size:1.4em; }
+    input, select, button {
+      width:100%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #ddd; font-size:1.1em;
+    }
+    button { background:#ff9933; color:white; border:none; font-weight:bold; cursor:pointer; }
+    button:hover { background:#e68900; }
+    .result { margin-top:20px; background:#f0f8ff; padding:15px; border-radius:10px; text-align:center; }
+    .result p { margin:10px 0; font-size:1.3em; }
+    strong { color: #138808; font-size:1.4em; }
+    footer { text-align:center; padding:15px; background:#138808; color:white; font-size:0.9em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>IndiaCalc</h1>
+      <p>All Indian Calculators in One Place – Made by Vasanth</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="openCalc('gst')">GST</button>
+      <button class="tab-btn" onclick="openCalc('emi')">EMI</button>
+      <button class="tab-btn" onclick="openCalc('tax')">Tax</button>
+      <button class="tab-btn" onclick="openCalc('sip')">SIP</button>
+      <button class="tab-btn" onclick="openCalc('fd')">FD/RD</button>
+      <button class="tab-btn" onclick="openCalc('discount')">Discount</button>
+    </div>
+
+    <!-- GST Calculator -->
+    <div id="gst" class="calc active">
+      <h2>GST Calculator</h2>
+      <input type="number" id="amount" placeholder="Enter Amount (₹)" />
+      <select id="rate">
+        <option value="5">5%</option>
+        <option value="12">12%</option>
+        <option value="18" selected>18%</option>
+        <option value="28">28%</option>
+      </select>
+      <button onclick="calcGST()">Calculate GST</button>
+      <div class="result">
+        <p>GST Amount: <strong id="gstAmt">₹0</strong></p>
+        <p>Total with GST: <strong id="totalAmt">₹0</strong></p>
+      </div>
+    </div>
+
+    <!-- EMI Calculator -->
+    <div id="emi" class="calc">
+      <h2>EMI Calculator</h2>
+      <input type="number" id="loan" placeholder="Loan Amount (₹)" />
+      <input type="number" id="months" placeholder="Tenure (Months)" />
+      <input type="number" id="rateEmi" placeholder="Interest Rate (% p.a.)" value="9" step="0.1"/>
+      <button onclick="calcEMI()">Calculate EMI</button>
+      <div class="result">
+        <p>Monthly EMI: <strong id="emiResult">₹0</strong></p>
+        <p>Total Interest: <strong id="totalInterest">₹0</strong></p>
+        <p>Total Payment: <strong id="totalPay">₹0</strong></p>
+      </div>
+    </div>
+
+    <!-- Income Tax (Simple) -->
+    <div id="tax" class="calc">
+      <h2>Income Tax (New Regime)</h2>
+      <input type="number" id="income" placeholder="Annual Income (₹)" />
+      <button onclick="calcTax()">Calculate Tax</button>
+      <div class="result">
+        <p>Tax to Pay: <strong id="taxAmt">₹0</strong></p>
+      </div>
+    </div>
+
+    <!-- SIP Calculator -->
+    <div id="sip" class="calc">
+      <h2>SIP Return Calculator</h2>
+      <input type="number" id="sipMonthly" placeholder="Monthly Investment (₹)" value="5000"/>
+      <input type="number" id="sipYears" placeholder="Years" value="10"/>
+      <input type="number" id="sipReturn" placeholder="Expected Return (% p.a.)" value="12"/>
+      <button onclick="calcSIP()">Calculate</button>
+      <div class="result">
+        <p>Invested: <strong id="invested">₹0</strong></p>
+        <p>Future Value: <strong id="futureValue">₹0</strong></p>
+        <p>Wealth Gained: <strong id="gain">₹0</strong></p>
+      </div>
+    </div>
+
+    <!-- FD/RD Calculator -->
+    <div id="fd" class="calc">
+      <h2>FD / RD Calculator</h2>
+      <input type="number" id="principal" placeholder="Principal Amount (₹)"/>
+      <input type="number" id="fdRate" placeholder="Interest Rate (%)" value="7"/>
+      <input type="number" id="fdTime" placeholder="Time (Years)" value="5"/>
+      <button onclick="calcFD()">Calculate Maturity</button>
+      <div class="result">
+        <p>Maturity Amount: <strong id="maturity">₹0</strong></p>
+        <p>Interest Earned: <strong id="fdInterest">₹0</strong></p>
+      </div>
+    </div>
+
+    <!-- Discount Calculator -->
+    <div id="discount" class="calc">
+      <h2>Discount Calculator</h2>
+      <input type="number" id="original" placeholder="Original Price (₹)"/>
+      <input type="number" id="discPercent" placeholder="Discount %"/>
+      <button onclick="calcDiscount()">Calculate</button>
+      <div class="result">
+        <p>You Save: <strong id="saveAmt">₹0</strong></p>
+        <p>Final Price: <strong id="finalPrice">₹0</strong></p>
+      </div>
+    </div>
+
+    <footer>
+      <p>Made with ❤️ by Vasanth • 2025 | Share with Friends!</p>
+    </footer>
+  </div>
+
+  <script>
+    function openCalc(name) {
+      document.querySelectorAll('.calc').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(name).classList.add('active');
+      document.querySelector(`button[onclick="openCalc('${name}')"]`).classList.add('active');
+    }
+
+    function calcGST() {
+      const a = parseFloat(document.getElementById('amount').value) || 0;
+      const r = parseFloat(document.getElementById('rate').value);
+      const gst = a * (r / 100);
+      document.getElementById('gstAmt').textContent = `₹${gst.toFixed(2)}`;
+      document.getElementById('totalAmt').textContent = `₹${(a + gst).toFixed(2)}`;
+    }
+
+    function calcEMI() {
+      const p = parseFloat(document.getElementById('loan').value) || 0;
+      const n = parseFloat(document.getElementById('months').value) || 0;
+      const r = parseFloat(document.getElementById('rateEmi').value) / 1200 || 0;
+      if (!p || !n || !r) return alert("Fill all fields");
+      const emi = p * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+      const total = emi * n;
+      document.getElementById('emiResult').textContent = `₹${emi.toFixed(0)}`;
+      document.getElementById('totalInterest').textContent = `₹${(total - p).toFixed(0)}`;
+      document.getElementById('totalPay').textContent = `₹${total.toFixed(0)}`;
+    }
+
+    function calcTax() {
+      let income = parseFloat(document.getElementById('income').value) || 0;
+      let tax = 0;
+      if (income > 1500000) tax += (income - 1500000) * 0.30;
+      else if (income > 1200000) tax += (income - 1200000) * 0.20;
+      else if (income > 900000) tax += (income - 900000) * 0.15;
+      else if (income > 600000) tax += (income - 600000) * 0.10;
+      else if (income > 300000) tax += (income - 300000) * 0.05;
+      document.getElementById('taxAmt').textContent = `₹${tax.toFixed(0)}`;
+    }
+
+    function calcSIP() {
+      const monthly = parseFloat(document.getElementById('sipMonthly').value) || 0;
+      const years = parseFloat(document.getElementById('sipYears').value) || 0;
+      const rate = parseFloat(document.getElementById('sipReturn').value) / 1200 || 0;
+      const months = years * 12;
+      const future = monthly * ((Math.pow(1 + rate, months) - 1) / rate) * (1 + rate);
+      const invested = monthly * months;
+      document.getElementById('invested').textContent = `₹${invested.toFixed(0)}`;
+      document.getElementById('futureValue').textContent = `₹${future.toFixed(0)}`;
+      document.getElementById('gain').textContent = `₹${(future - invested).toFixed(0)}`;
+    }
+
+    function calcFD() {
+      const p = parseFloat(document.getElementById('principal').value) || 0;
+      const r = parseFloat(document.getElementById('fdRate').value) / 100 || 0;
+      const t = parseFloat(document.getElementById('fdTime').value) || 0;
+      const amount = p * Math.pow(1 + r/4, 4*t);
+      document.getElementById('maturity').textContent = `₹${amount.toFixed(0)}`;
+      document.getElementById('fdInterest').textContent = `₹${(amount - p).toFixed(0)}`;
+    }
+
+    function calcDiscount() {
+      const original = parseFloat(document.getElementById('original').value) || 0;
+      const percent = parseFloat(document.getElementById('discPercent').value) || 0;
+      const save = original * (percent / 100);
+      document.getElementById('saveAmt').textContent = `₹${save.toFixed(2)}`;
+      document.getElementById('finalPrice').textContent = `₹${(original - save).toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
